@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bytesquad.rescuebites.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
@@ -15,6 +16,12 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val justRegistered = intent.getBooleanExtra("justRegistered", false)
+        if (justRegistered) {
+            Toast.makeText(this, "Registration successful. Please log in.", Toast.LENGTH_LONG).show()
+        }
+
 
         auth = FirebaseAuth.getInstance()
 
@@ -31,8 +38,21 @@ class LoginActivity : AppCompatActivity() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Toast.makeText(this, "Welcome!", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this, MainActivity::class.java))
-                        finish()
+                        val uid = auth.currentUser?.uid
+                        FirebaseFirestore.getInstance().collection("users").document(uid!!)
+                            .get()
+                            .addOnSuccessListener { document ->
+                                val role = document.getString("role")
+                                when (role) {
+                                    "Donor" -> startActivity(Intent(this, DonorActivity::class.java))
+                                    "Beneficiary" -> startActivity(Intent(this, BeneficiaryActivity::class.java))
+                                    "Distributor" -> startActivity(Intent(this, DistributorActivity::class.java))
+                                    else -> Toast.makeText(this, "Unknown role", Toast.LENGTH_SHORT).show()
+                                }
+                                finish()
+                            }
+
+
                     } else {
                         Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
