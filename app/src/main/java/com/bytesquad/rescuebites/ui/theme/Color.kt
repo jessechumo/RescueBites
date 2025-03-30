@@ -1,4 +1,4 @@
-package com.bytesquad.resucebites.ui.theme
+package com.bytesquad.rescuebites.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

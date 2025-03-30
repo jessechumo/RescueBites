@@ -13,6 +13,18 @@
         android:theme="@style/Theme.RescueBites"
         tools:targetApi="31">
         <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:theme="@style/Theme.RescueBites" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.RescueBites" />
+        <activity
+        android:name=".ForgotPasswordActivity"
+        android:exported="false"
+        android:theme="@style/Theme.RescueBites" />
+              <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"

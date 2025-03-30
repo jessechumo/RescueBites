@@ -7,4 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="primary">#4CAF50</color>       <!-- Green -->
+    <color name="onPrimary">#FFFFFF</color>     <!-- White text on green -->
+
+    <color name="secondary">#FFC107</color>     <!-- Yellow -->
+    <color name="onSecondary">#000000</color>   <!-- Black text on yellow -->
+
+    <color name="background">#FFFFFF</color>    <!-- White -->
+    <color name="onBackground">#000000</color>  <!-- Black text -->
+
+    <color name="error">#F44336</color>         <!-- Red -->
 </resources>

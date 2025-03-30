@@ -1,5 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.RescueBites" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Base application theme -->
+    <style name="Theme.RescueBites" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/onPrimary</item>
+
+        <!-- Secondary / accent -->
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/onSecondary</item>
+
+        <!-- Backgrounds -->
+        <item name="colorSurface">@color/background</item>
+        <item name="colorOnSurface">@color/onBackground</item>
+
+
+        <!-- Errors -->
+        <item name="colorError">@color/error</item>
+
+        <!-- Status bar, nav bar, etc. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+    </style>
+
 </resources>

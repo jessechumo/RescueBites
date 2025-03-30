@@ -1,4 +1,4 @@
-package com.bytesquad.resucebites
+package com.bytesquad.rescuebites
 
 import org.junit.Test
 
