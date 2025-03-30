@@ -13,6 +13,16 @@
         android:theme="@style/Theme.RescueBites.AppCompat"
         tools:targetApi="31">
         <activity
+            android:name=".EditListingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.RescueBites.AppCompat"
+            />
+        <activity
+            android:name=".ManageListingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.RescueBites.AppCompat"
+            />
+        <activity
             android:name=".FoodListingActivity"
             android:exported="false"
             android:theme="@style/Theme.RescueBites.AppCompat" />
