@@ -21,6 +21,14 @@
         android:inputType="textPassword"
         android:layout_marginTop="16dp"/>
 
+    <Spinner
+        android:id="@+id/roleSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:entries="@array/user_roles" />
+
+
     <Button
         android:id="@+id/registerButton"
         android:layout_width="match_parent"
