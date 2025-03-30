@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,19 +15,13 @@ import com.bytesquad.rescuebites.databinding.ItemFoodListingBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-data class FoodItem(
-    val id: String = "",
-    val type: String = "",
-    val quantity: Int = 0,
-    val expiryDate: String = "",
-    val pickupLocation: String = ""
-)
-
 class ManageListingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityManageListingsBinding
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
     private val listings = mutableListOf<FoodItem>()
+
+    private lateinit var editListingLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +35,17 @@ class ManageListingsActivity : AppCompatActivity() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
+        editListingLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                loadListings() // Refresh listings when returning
+            }
+        }
+
+        loadListings()
+    }
+
+    private fun loadListings() {
+        listings.clear()
         val uid = auth.currentUser?.uid ?: return
         db.collection("foodItems")
             .whereEqualTo("donorId", uid)
@@ -50,11 +57,16 @@ class ManageListingsActivity : AppCompatActivity() {
                         type = doc.getString("type") ?: "",
                         quantity = doc.getLong("quantity")?.toInt() ?: 0,
                         expiryDate = doc.getString("expiryDate") ?: "",
-                        pickupLocation = doc.getString("pickupLocation") ?: ""
+                        pickupLocation = doc.getString("pickupLocation") ?: "",
+                        donorId = doc.getString("donorId") ?: "",
+                        timeStamp = doc.getString("timeStamp") ?: ""
                     )
                     listings.add(item)
                 }
-                adapter.notifyDataSetChanged()
+                binding.recyclerView.adapter?.notifyDataSetChanged()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load listings", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -79,16 +91,20 @@ class ManageListingsActivity : AppCompatActivity() {
                         listings.removeAt(position)
                         notifyItemRemoved(position)
                     }
+                    .addOnFailureListener {
+                        Toast.makeText(this@ManageListingsActivity, "Delete failed", Toast.LENGTH_SHORT).show()
+                    }
             }
 
             holder.itemBinding.btnEdit.setOnClickListener {
-                val intent = Intent(this@ManageListingsActivity, EditListingActivity::class.java)
-                intent.putExtra("id", item.id)
-                intent.putExtra("type", item.type)
-                intent.putExtra("quantity", item.quantity)
-                intent.putExtra("expiry", item.expiryDate)
-                intent.putExtra("location", item.pickupLocation)
-                startActivity(intent)
+                val intent = Intent(this@ManageListingsActivity, EditListingActivity::class.java).apply {
+                    putExtra("id", item.id)
+                    putExtra("type", item.type)
+                    putExtra("quantity", item.quantity)
+                    putExtra("expiry", item.expiryDate)
+                    putExtra("location", item.pickupLocation)
+                }
+                editListingLauncher.launch(intent)
             }
         }
 

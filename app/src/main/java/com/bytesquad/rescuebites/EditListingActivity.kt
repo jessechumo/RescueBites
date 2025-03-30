@@ -1,5 +1,6 @@
 package com.bytesquad.rescuebites
 
+import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +18,7 @@ class EditListingActivity : AppCompatActivity() {
         binding = ActivityEditListingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        listingId = intent.getStringExtra("listingId") ?: ""
+        listingId = intent.getStringExtra("id") ?: ""
 
         if (listingId.isEmpty()) {
             Toast.makeText(this, "Invalid listing ID", Toast.LENGTH_SHORT).show()
@@ -25,38 +26,26 @@ class EditListingActivity : AppCompatActivity() {
             return
         }
 
-        // Load existing listing data
-        db.collection("foodItems").document(listingId)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    binding.editFoodName.setText(document.getString("name") ?: "")
-                    binding.editQuantity.setText(document.getLong("quantity")?.toString() ?: "")
-                    binding.editExpiryDate.setText(document.getString("expiryDate") ?: "")
-                    binding.editPickupLocation.setText(document.getString("pickupLocation") ?: "")
-                } else {
-                    Toast.makeText(this, "Listing not found", Toast.LENGTH_SHORT).show()
-                    finish()
-                }
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Error loading listing", Toast.LENGTH_SHORT).show()
-            }
+        // Pre-fill form fields
+        binding.editFoodName.setText(intent.getStringExtra("type") ?: "")
+        binding.editQuantity.setText((intent.getIntExtra("quantity", 0)).toString())
+        binding.editExpiryDate.setText(intent.getStringExtra("expiry") ?: "")
+        binding.editPickupLocation.setText(intent.getStringExtra("location") ?: "")
 
-        // Save button logic
+        // Update logic
         binding.saveChangesButton.setOnClickListener {
-            val updatedData = hashMapOf<String, Any>(
-                "name" to binding.editFoodName.text.toString().trim(),
-                "quantity" to (binding.editQuantity.text.toString().trim().toLongOrNull() ?: 0L),
+            val updated = hashMapOf<String, Any>(
+                "type" to binding.editFoodName.text.toString().trim(),
+                "quantity" to (binding.editQuantity.text.toString().toIntOrNull() ?: 0),
                 "expiryDate" to binding.editExpiryDate.text.toString().trim(),
                 "pickupLocation" to binding.editPickupLocation.text.toString().trim()
             )
 
-
             db.collection("foodItems").document(listingId)
-                .update(updatedData)
+                .update(updated)
                 .addOnSuccessListener {
-                    Toast.makeText(this, "Listing updated successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Updated successfully", Toast.LENGTH_SHORT).show()
+                    setResult(Activity.RESULT_OK)
                     finish()
                 }
                 .addOnFailureListener {
@@ -64,12 +53,13 @@ class EditListingActivity : AppCompatActivity() {
                 }
         }
 
-        // Delete button logic
+        // Delete logic
         binding.deleteButton.setOnClickListener {
             db.collection("foodItems").document(listingId)
                 .delete()
                 .addOnSuccessListener {
-                    Toast.makeText(this, "Listing deleted", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Deleted successfully", Toast.LENGTH_SHORT).show()
+                    setResult(Activity.RESULT_OK)
                     finish()
                 }
                 .addOnFailureListener {
