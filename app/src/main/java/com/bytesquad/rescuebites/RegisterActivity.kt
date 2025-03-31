@@ -9,8 +9,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var auth: FirebaseAuth
+    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,50 +24,45 @@ class RegisterActivity : AppCompatActivity() {
         binding.registerButton.setOnClickListener {
             val email = binding.emailEditText.text.toString().trim()
             val password = binding.passwordEditText.text.toString().trim()
-            val selectedRole = binding.roleSpinner.selectedItem.toString()
+            val role = binding.roleSpinner.selectedItem.toString()
 
             if (email.isEmpty() || password.length < 6) {
-                Toast.makeText(this, "Enter valid email & password (6+ chars)", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(this, "Enter valid email & password (min 6 chars)", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
+            // Step 1: Create user in FirebaseAuth
             auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val uid = auth.currentUser?.uid
-                        val user = hashMapOf(
+                .addOnSuccessListener { authResult ->
+                    val uid = authResult.user?.uid
+                    if (uid != null) {
+                        // Step 2: Save user data in Firestore
+                        val userData = hashMapOf(
                             "email" to email,
-                            "role" to selectedRole
+                            "role" to role
                         )
-                        FirebaseFirestore.getInstance().collection("users").document(uid!!)
-                            .set(user)
+
+                        db.collection("users").document(uid)
+                            .set(userData)
                             .addOnSuccessListener {
-                                Toast.makeText(this, "Registered as $selectedRole!", Toast.LENGTH_SHORT).show()
-                                startActivity(
-                                    Intent(this, LoginActivity::class.java).apply {
-                                        putExtra("justRegistered", true)
-                                    }
-                                )
+                                Toast.makeText(this, "Registered successfully! Please login.", Toast.LENGTH_SHORT).show()
+                                startActivity(Intent(this, LoginActivity::class.java))
                                 finish()
                             }
+                            .addOnFailureListener {
+                                Toast.makeText(this, "Registration failed: ${it.message}", Toast.LENGTH_SHORT).show()
+                            }
                     } else {
-                        Toast.makeText(
-                            this,
-                            "Error: ${task.exception?.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(this, "Failed to get user ID", Toast.LENGTH_SHORT).show()
                     }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
                 }
         }
 
-
-            binding.loginRedirectText.setOnClickListener {
-                startActivity(
-                    Intent(this, LoginActivity::class.java).apply {
-                        putExtra("justRegistered", true)
-                    }
-                )
-            }
+        binding.loginRedirectText.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
+        }
     }
 }

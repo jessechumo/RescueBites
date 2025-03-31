@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#4CAF50</color>       <!-- Green -->
     <color name="onPrimary">#FFFFFF</color>     <!-- White text on green -->
+    <color name="primary_dark">#2E7D32</color>
 
     <color name="secondary">#FFC107</color>     <!-- Yellow -->
     <color name="onSecondary">#000000</color>   <!-- Black text on yellow -->

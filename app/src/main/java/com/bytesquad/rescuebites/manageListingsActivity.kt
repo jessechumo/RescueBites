@@ -10,10 +10,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.bytesquad.rescuebites.databinding.ActivityManageListingsBinding
 import com.bytesquad.rescuebites.databinding.ItemFoodListingBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Date
 
 class ManageListingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityManageListingsBinding
@@ -22,6 +24,7 @@ class ManageListingsActivity : AppCompatActivity() {
     private val listings = mutableListOf<FoodItem>()
 
     private lateinit var editListingLauncher: ActivityResultLauncher<Intent>
+    private lateinit var addListingLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +42,17 @@ class ManageListingsActivity : AppCompatActivity() {
             if (result.resultCode == RESULT_OK) {
                 loadListings() // Refresh listings when returning
             }
+        }
+
+        addListingLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                loadListings() // Refresh listings after adding
+            }
+        }
+
+        binding.addListingButton.setOnClickListener {
+            val intent = Intent(this, AddListingActivity::class.java)
+            addListingLauncher.launch(intent)
         }
 
         loadListings()
@@ -59,7 +73,9 @@ class ManageListingsActivity : AppCompatActivity() {
                         expiryDate = doc.getString("expiryDate") ?: "",
                         pickupLocation = doc.getString("pickupLocation") ?: "",
                         donorId = doc.getString("donorId") ?: "",
-                        timeStamp = doc.getString("timeStamp") ?: ""
+                        timeStamp = doc.getTimestamp("timeStamp")?.toDate(),
+                        imageUrl = doc.getString("imageUrl")
+                            ?: "https://source.unsplash.com/400x200/?food&sig=${(1..1000).random()}"
                     )
                     listings.add(item)
                 }
@@ -81,6 +97,11 @@ class ManageListingsActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: FoodViewHolder, position: Int) {
             val item = listings[position]
+
+            Glide.with(this@ManageListingsActivity)
+                .load(item.imageUrl)
+                .into(holder.itemBinding.foodImage)
+
             holder.itemBinding.foodInfo.text = "${item.type} - Qty: ${item.quantity}\nExp: ${item.expiryDate}\nLocation: ${item.pickupLocation}"
 
             holder.itemBinding.btnDelete.setOnClickListener {

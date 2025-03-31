@@ -1,4 +1,6 @@
 package com.bytesquad.rescuebites
+import java.util.Date
+
 
 data class FoodItem(
     val id: String = "",
@@ -7,6 +9,9 @@ data class FoodItem(
     val expiryDate: String = "",
     val pickupLocation: String = "",
     val donorId: String = "",
-    val timeStamp: String = ""
+    val timeStamp: Date? = null,
+    val imageUrl: String = ""
+
+
 )
 
