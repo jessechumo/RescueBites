@@ -3,6 +3,7 @@ package com.bytesquad.rescuebites
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.bytesquad.rescuebites.databinding.ItemFoodListingBinding
 
 class FoodListingAdapter(
@@ -21,8 +22,13 @@ class FoodListingAdapter(
         val item = foodList[position]
         holder.binding.foodInfo.text = "Food: ${item.type} - Qty: ${item.quantity}\nExp: ${item.expiryDate}\nLocation: ${item.pickupLocation}"
 
-        // Optional: Add delete/edit button handling if needed
+        Glide.with(holder.itemView.context)
+            .load(item.imageUrl)
+            .placeholder(android.R.drawable.ic_menu_report_image) // fallback while loading
+            .error(android.R.drawable.ic_delete) // fallback if loading fails
+            .into(holder.binding.foodImage)
     }
+
 
     override fun getItemCount(): Int = foodList.size
 }

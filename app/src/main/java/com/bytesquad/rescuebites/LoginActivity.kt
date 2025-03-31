@@ -37,26 +37,35 @@ class LoginActivity : AppCompatActivity() {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(this, "Welcome!", Toast.LENGTH_SHORT).show()
                         val uid = auth.currentUser?.uid
-                        FirebaseFirestore.getInstance().collection("users").document(uid!!)
-                            .get()
-                            .addOnSuccessListener { document ->
-                                val role = document.getString("role")
-                                when (role) {
-                                    "Donor" -> startActivity(Intent(this, DonorActivity::class.java))
-                                    "Beneficiary" -> startActivity(Intent(this, BeneficiaryActivity::class.java))
-                                    "Distributor" -> startActivity(Intent(this, DistributorActivity::class.java))
-                                    else -> Toast.makeText(this, "Unknown role", Toast.LENGTH_SHORT).show()
+                        if (uid != null) {
+                            FirebaseFirestore.getInstance().collection("users").document(uid)
+                                .get()
+                                .addOnSuccessListener { document ->
+                                    if (document.exists()) {
+                                        val role = document.getString("role")
+                                        when (role) {
+                                            "Donor" -> startActivity(Intent(this, ManageListingsActivity::class.java))
+                                            "Beneficiary" -> startActivity(Intent(this, BrowseFoodActivity::class.java))
+                                            "Distributor" -> startActivity(Intent(this, DistributorActivity::class.java))
+                                            else -> Toast.makeText(this, "Unknown role: $role", Toast.LENGTH_SHORT).show()
+                                        }
+                                        finish()
+                                    } else {
+                                        Toast.makeText(this, "User document not found", Toast.LENGTH_SHORT).show()
+                                    }
                                 }
-                                finish()
-                            }
-
-
+                                .addOnFailureListener {
+                                    Toast.makeText(this, "Failed to fetch user role", Toast.LENGTH_SHORT).show()
+                                }
+                        } else {
+                            Toast.makeText(this, "Failed to get user ID", Toast.LENGTH_SHORT).show()
+                        }
                     } else {
                         Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
+
         }
 
 
