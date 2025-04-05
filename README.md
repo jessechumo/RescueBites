@@ -6,29 +6,12 @@ RescueBites is an Android app that bridges the gap between food donors and peopl
 
 ## 📱 Features
 
-- 🔐 **User Authentication**
-  - Register, Login, and Forgot Password with Firebase Authentication
-  - Redirect flow based on auth state
-
-- 👥 **User Roles**
-  - Donor: Adds food listings
-  - Beneficiary: Browses and requests food
-  - Distributor: Handles delivery or pickups (Coming Soon)
-
-- 🧾 **Food Listing**
-  - Donors can add food items with quantity, expiry date, and pickup location
-
-- 🗺️ **Pickup Tracking**
-  - Google Maps integration for locating pickup points (Coming Soon)
-
-- 📦 **QR Code Pickup Verification**
-  - Secure pickup confirmation with QR scanning (Coming Soon)
-
-- 🔔 **Notifications**
-  - Real-time alerts for approved requests, reminders, and expiring items (Coming Soon)
-
-- 📊 **Reports**
-  - Donors can view reports on food saved and distributed (Coming Soon)
+- 🔐 Secure login for Donors, Beneficiaries, and Distributors
+- 📸 Add food listings with image, expiry date, and location
+- 🧭 Find nearby pickup points using Google Maps
+- 🔔 Get notified about new food and approvals
+- 📦 Confirm pickups via QR code (planned)
+- 📊 Donor analytics and reports (planned)
 
 ---
 
@@ -43,7 +26,7 @@ RescueBites is an Android app that bridges the gap between food donors and peopl
 
 ---
 
-## 🧾 System Requirements
+## 🧾 Functional Requirements
 
 | Req ID | Req Statement | Line Reference |
 |--------|---------------|----------------|
