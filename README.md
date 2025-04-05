@@ -28,24 +28,24 @@ RescueBites is an Android app that bridges the gap between food donors and peopl
 
 ## 🧾 Functional Requirements
 
-| Req ID | Req Statement | Line Reference |
-|--------|---------------|----------------|
-| R1 | The system shall provide authenticated login for users, including Beneficiaries, Donors, and Distributors. | 24 |
-| R2 | The system shall allow users to reset their password using a secure recovery process. | derived |
-| R3 | The system shall allow donors to list surplus food with details such as type, quantity, expiry date, and pickup location. | 28, 29 |
-| R4 | The system shall allow donors to update or remove food listings when food is no longer available. | 30 |
-| R5 | The system shall allow beneficiaries to browse available food listings based on location and availability. | 8, 9, 32 |
-| R6 | The system shall notify beneficiaries and donors when their food requests have been approved. | 39 |
-| R7 | The system shall integrate Google Maps to help users locate pickup points for food collection. | 8, 36 |
-| R8 | The system shall allow distributors to manage and track deliveries for users who cannot pick up food themselves. | 37 |
-| R9 | The system shall send push notifications to beneficiaries for new food listings, request approvals, and pickup reminders. | 39, 40 |
-| R10 | The system shall allow beneficiaries to confirm food pickup using a QR code or manual verification. | 43 |
-| R11 | The system shall allow donors to track their donations and generate reports on food saved. | 44, 45, 46 |
-| R12 | The system shall require an internet connection for account creation, login, and accessing food listings. | 47, 48 |
-| R13 | The system shall allow donors to upload images of food items using their camera or device storage. | 49, 50 |
-| R14 | The system shall use GPS to assist beneficiaries in finding the nearest food pickup points. | 36, 51, 52 |
-| R15 | The system shall ensure secure authentication and data privacy for all users. | derived |
-| R16 | The system shall allow users to log out. | derived |
+| Req ID | Req Statement | 
+|--------|---------------| 
+| R1 | The system shall provide authenticated login for users, including Beneficiaries, Donors, and Distributors. |  
+| R2 | The system shall allow users to reset their password using a secure recovery process. | 
+| R3 | The system shall allow donors to list surplus food with details such as type, quantity, expiry date, and pickup location. |  
+| R4 | The system shall allow donors to update or remove food listings when food is no longer available. |  
+| R5 | The system shall allow beneficiaries to browse available food listings based on location and availability. |  
+| R6 | The system shall notify beneficiaries and donors when their food requests have been approved. |  
+| R7 | The system shall integrate Google Maps to help users locate pickup points for food collection. |  
+| R8 | The system shall allow distributors to manage and track deliveries for users who cannot pick up food themselves. | 
+| R9 | The system shall send push notifications to beneficiaries for new food listings, request approvals, and pickup reminders. |  
+| R10 | The system shall allow beneficiaries to confirm food pickup using a QR code or manual verification. |  
+| R11 | The system shall allow donors to track their donations and generate reports on food saved. |  
+| R12 | The system shall require an internet connection for account creation, login, and accessing food listings. |  
+| R13 | The system shall allow donors to upload images of food items using their camera or device storage. |  
+| R14 | The system shall use GPS to assist beneficiaries in finding the nearest food pickup points. | 
+| R15 | The system shall ensure secure authentication and data privacy for all users. | 
+| R16 | The system shall allow users to log out. |  
 
 
 ---
