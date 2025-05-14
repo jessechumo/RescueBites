@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "274750162163",
+    "project_id": "rescuebites-e1295",
+    "storage_bucket": "rescuebites-e1295.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:274750162163:android:cc1ac3c2aebf8cc3dca386",
+        "android_client_info": {
+          "package_name": "com.bytesquad.rescuebites"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4A5yagS2yXDxGjqOh7HRfI8tAQLP76YE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:274750162163:android:3298f883f7ce3f88dca386",
+        "android_client_info": {
+          "package_name": "com.rescuebites"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4A5yagS2yXDxGjqOh7HRfI8tAQLP76YE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

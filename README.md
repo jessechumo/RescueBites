@@ -1,97 +1,162 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 🥗 RescueBites
 
-# Getting Started
+RescueBites is a cross-platform mobile app built with React Native that bridges the gap between food donors and people in need by redistributing surplus food in real time. The app aims to reduce food waste while fighting hunger through a community-powered system.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## 📱 Features
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- 🔐 Secure login for Donors, Beneficiaries, and Distributors
+- 📸 Add food listings with image, expiry date, and location
+- 🧭 Find nearby pickup points using Google Maps
+- 🔔 Get notified about new food and approvals
+- 📦 Confirm pickups via QR code
+- 📊 Donor analytics and reports (planned)
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+---
 
-```sh
-# Using npm
-npm start
+## 🚀 Tech Stack
 
-# OR using Yarn
-yarn start
+- **React Native (JavaScript)** – built with functional components and hooks
+- **Firebase Authentication** – for user login/register/reset
+- **Firebase Firestore** – for storing food listings
+- **Firebase Cloud Messaging (FCM)** – for push notifications
+- **Google Maps SDK** – for locating pickup points
+- **react-native-camera** – for QR code scanning
+- **react-native-qrcode-svg** – for generating QR codes
+- **react-native-firebase** – Firebase SDK bindings for React Native
+
+---
+
+## 🧾 Functional Requirements
+
+| Req ID | Req Statement | 
+|--------|---------------| 
+| R1 | The system shall provide authenticated login for users, including Beneficiaries, Donors, and Distributors. |  
+| R2 | The system shall allow users to reset their password using a secure recovery process. | 
+| R3 | The system shall allow donors to list surplus food with details such as type, quantity, expiry date, and pickup location. |  
+| R4 | The system shall allow donors to update or remove food listings when food is no longer available. |  
+| R5 | The system shall allow beneficiaries to browse available food listings based on location and availability. |  
+| R6 | The system shall notify beneficiaries and donors when their food requests have been approved. |  
+| R7 | The system shall integrate Google Maps to help users locate pickup points for food collection. |  
+| R8 | The system shall allow distributors to manage and track deliveries for users who cannot pick up food themselves. | 
+| R9 | The system shall send push notifications to beneficiaries for new food listings, request approvals, and pickup reminders. |  
+| R10 | The system shall allow beneficiaries to confirm food pickup using a QR code or manual verification. |  
+| R11 | The system shall allow donors to track their donations and generate reports on food saved. |  
+| R12 | The system shall require an internet connection for account creation, login, and accessing food listings. |  
+| R13 | The system shall allow donors to upload images of food items using their camera or device storage. |  
+| R14 | The system shall use GPS to assist beneficiaries in finding the nearest food pickup points. | 
+| R15 | The system shall ensure secure authentication and data privacy for all users. | 
+| R16 | The system shall allow users to log out. |  
+
+---
+
+## 📋 Use Case List
+
+| Use Case # | Use Case Name                      |
+|------------|------------------------------------|
+| UC1        | Register User                      |
+| UC2        | Log in User                        |
+| UC3        | Reset Password                     |
+| UC4        | Add Food Listing                   |
+| UC5        | Update Food Listing                |
+| UC6        | Browse Food                        |
+| UC7        | Approve Food Request               |
+| UC8        | Locate Pickup Points               |
+| UC9        | Track Delivery                     |
+| UC10       | Notify New Food Listing            |
+| UC11       | Notify Request Approval            |
+| UC12       | Send Food Pickup Reminder          |
+| UC13       | Generate Food Pickup code          |
+| UC14       | Generate Saved Food Reports        |
+| UC15       | Secure Authentication              |
+| UC16       | Log out User                       |
+
+---
+
+## 📦 Design Class Diagram
+     
+![Screenshot From 2025-04-02 08-08-47](https://github.com/user-attachments/assets/e4ed7e87-8572-478b-b108-8048dbbd24fa)
+
+---
+
+## 🛠️ How to Run  
+
+### Prerequisites
+
+- Node.js >= 16.x
+- npm or yarn
+- Android Studio (for emulator + SDKs)
+- Firebase project with `google-services.json`
+
+---
+
+### 1. Clone the Repo
+
+```bash
+git clone https://github.com/your-username/RescueBites.git
+cd RescueBites
 ```
 
-## Step 2: Build and run your app
+### 2. Install Dependencies
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```bash
+npm install
+# or
+yarn
 ```
 
-### iOS
+### 3. Add Firebase Config
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+- Go to [Firebase Console](https://console.firebase.google.com/)
+- Create a project (or use existing)
+- Enable:
+  - **Authentication** (Email/Password)
+  - **Firestore Database**
+  - **Cloud Messaging**
+- Download `google-services.json` and place it in `android/app/`
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+---
 
-```sh
-bundle install
+### 4. Start Metro Bundler
+
+```bash
+npx react-native start
 ```
 
-Then, and every time you update your native dependencies, run:
+### 5. Build & Run App on Android
 
-```sh
-bundle exec pod install
+```bash
+npx react-native run-android
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+> Make sure a device or emulator is connected.
 
-```sh
-# Using npm
-npm run ios
+---
 
-# OR using Yarn
-yarn ios
-```
+### ✅ For Demo
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+- Log in as Donor, Beneficiary, or Distributor
+- Donors can add/edit/delete listings
+- Beneficiaries can browse and claim food
+- QR Scanner works for confirming pickup
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+---
 
-## Step 3: Modify your app
+## 📌 Notes
 
-Now that you have successfully run the app, let's make changes!
+- QR scanning uses `react-native-camera` – tested on Android 10+
+- Push notifications use FCM (v1 API)
+- Google Maps uses API key configured in `AndroidManifest.xml`
+- Notifications trigger on new food added or claim approved
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+---
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+## 💡 Future Plans
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+- Real-time delivery tracking with geolocation
+- Analytics dashboard for donors
+- Admin role for moderation
 
-## Congratulations! :tada:
+---
 
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
