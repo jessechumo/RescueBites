@@ -18,27 +18,27 @@ export default function SignUpScreen({ navigation }) {
       Alert.alert('Missing Fields', 'Please fill all fields and select a user type.');
       return;
     }
-
+  
     if (password !== confirmPassword) {
       Alert.alert('Password Mismatch', 'Passwords do not match.');
       return;
     }
-
+  
     if (password.length < 6) {
       Alert.alert('Weak Password', 'Password must be at least 6 characters.');
       return;
     }
-
+  
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await auth().createUserWithEmailAndPassword(email, password); // <-- HERE
       const uid = userCredential.user.uid;
-
-      await setDoc(doc(db, 'users', uid), {
+  
+      await db().collection('users').doc(uid).set({ // <-- HERE
         email,
         role,
         createdAt: new Date(),
       });
-
+  
       Alert.alert('Success', 'Account created! Please log in.');
       navigation.navigate('Login');
     } catch (error) {
@@ -46,6 +46,7 @@ export default function SignUpScreen({ navigation }) {
       Alert.alert('Signup Error', error.message);
     }
   };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">

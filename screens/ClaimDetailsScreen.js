@@ -1,59 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import {
-  View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView,
-  StatusBar, ScrollView, Alert, Modal
+  View, Text, StyleSheet, SafeAreaView, StatusBar,
+  TouchableOpacity, Image, ScrollView, Alert
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { RNCamera } from 'react-native-camera';
 
 export default function ClaimDetailsScreen() {
   const { params } = useRoute();
   const navigation = useNavigation();
   const food = params?.food;
-  const [hasPermission, setHasPermission] = useState(null);
-  const [showScanner, setShowScanner] = useState(false);
-  const [scanning, setScanning] = useState(true);
-  const cameraRef = useRef(null);
 
-  useEffect(() => {
-    // Check camera permissions when component mounts
-    checkCameraPermission();
-  }, []);
-
-  const checkCameraPermission = async () => {
-    try {
-      const status = await RNCamera.requestPermissionsAsync();
-      setHasPermission(status === true || status === 'authorized');
-    } catch (err) {
-      console.error('Error checking camera permission:', err);
-      setHasPermission(false);
-    }
-  };
+  if (!food) return null;
 
   const openConfirmPickup = () => {
     Alert.alert('Confirm Pickup', 'Choose how to confirm:', [
-      {
-        text: 'Scan QR Code',
-        onPress: () => {
-          if (hasPermission) {
-            setScanning(true);
-            setShowScanner(true);
-          } else {
-            Alert.alert(
-              'Permission Denied', 
-              'Camera access is required. Please enable it in your device settings.',
-              [
-                { text: 'OK' },
-                { 
-                  text: 'Check Permission', 
-                  onPress: checkCameraPermission 
-                }
-              ]
-            );
-          }
-        },
-      },
+      { text: 'Scan QR Code', onPress: () => navigation.navigate('Scanner', { food }) },
       {
         text: 'Manual Confirm',
         onPress: () => {
@@ -64,39 +26,12 @@ export default function ClaimDetailsScreen() {
     ]);
   };
 
-  const handleBarCodeScanned = ({ data }) => {
-    if (!scanning) return;
-    
-    // Prevent multiple scans
-    setScanning(false);
-    
-    if (data === food.id) {
-      Alert.alert('Success', '✅ Pickup confirmed via QR code!', 
-        [{ text: 'OK', onPress: () => setShowScanner(false) }]
-      );
-    } else {
-      Alert.alert('Mismatch', '❌ Scanned code does not match.', 
-        [{ 
-          text: 'Try Again', 
-          onPress: () => setScanning(true) 
-        },
-        { 
-          text: 'Cancel', 
-          onPress: () => setShowScanner(false),
-          style: 'cancel' 
-        }]
-      );
-    }
-  };
-
   const openRequestDelivery = () => {
     Alert.alert('Request Delivery', `Send a delivery request for ${food.foodType}?`, [
       { text: 'Yes', onPress: () => Alert.alert('Success', 'Delivery requested.') },
       { text: 'Cancel', style: 'cancel' },
     ]);
   };
-
-  if (!food) return null;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -146,42 +81,6 @@ export default function ClaimDetailsScreen() {
           </>
         )}
       </ScrollView>
-
-      <Modal visible={showScanner} animationType="slide" onRequestClose={() => setShowScanner(false)}>
-        <SafeAreaView style={{ flex: 1 }}>
-          <RNCamera
-            ref={cameraRef}
-            style={{ flex: 1 }}
-            type={RNCamera.Constants.Type.back}
-            captureAudio={false}
-            androidCameraPermissionOptions={{
-              title: 'Permission to use camera',
-              message: 'We need your permission to use your camera for QR scanning',
-              buttonPositive: 'OK',
-              buttonNegative: 'Cancel',
-            }}
-            onBarCodeRead={scanning ? handleBarCodeScanned : null}
-            barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
-          >
-            <View style={styles.scannerOverlay}>
-              <View style={styles.scannerGuide}>
-                <View style={styles.scannerCorner} />
-                <View style={styles.scannerCorner} />
-                <View style={styles.scannerCorner} />
-                <View style={styles.scannerCorner} />
-              </View>
-              <Text style={styles.scanText}>Align QR code within frame</Text>
-            </View>
-          </RNCamera>
-          <TouchableOpacity 
-            style={styles.cancelScan} 
-            onPress={() => setShowScanner(false)}
-          >
-            <Ionicons name="close-circle" size={36} color="#fff" />
-            <Text style={{ color: '#fff', marginTop: 5 }}>Cancel</Text>
-          </TouchableOpacity>
-        </SafeAreaView>
-      </Modal>
     </SafeAreaView>
   );
 }
@@ -192,18 +91,27 @@ const styles = StyleSheet.create({
   backBtn: { padding: 8 },
   headerTitle: { flex: 1, textAlign: 'center', fontSize: 18, fontWeight: '600', color: '#333' },
   container: { padding: 16 },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 24, elevation: 3, alignItems: 'center' },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    elevation: 3,
+    alignItems: 'center'
+  },
   foodImage: { width: '100%', height: 200, borderRadius: 8, marginBottom: 16 },
   placeholder: { justifyContent: 'center', alignItems: 'center', backgroundColor: '#e0e0e0' },
   foodType: { fontSize: 22, fontWeight: '700', color: '#222', marginBottom: 12 },
   detailRow: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginVertical: 4 },
   label: { fontSize: 16, color: '#555' },
   value: { fontSize: 16, fontWeight: '500', color: '#333' },
-  actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, borderRadius: 8, marginBottom: 12 },
+  actionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 8,
+    marginBottom: 12
+  },
   actionText: { color: '#fff', fontSize: 16, fontWeight: '600', marginLeft: 8 },
-  cancelScan: { position: 'absolute', bottom: 30, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 40, padding: 12, alignItems: 'center' },
-  scannerOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  scannerGuide: { width: 250, height: 250, borderWidth: 2, borderColor: '#fff', backgroundColor: 'transparent' },
-  scannerCorner: { width: 20, height: 20, borderColor: '#4CAF50', borderWidth: 3, position: 'absolute' },
-  scanText: { color: '#fff', marginTop: 20, fontSize: 16, backgroundColor: 'rgba(0,0,0,0.7)', padding: 8, borderRadius: 4 },
 });

@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TextInput, Alert
+  View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TextInput, Alert, Image
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BottomNavbar from '../components/BottomNavbar';
 import { useNavigation } from '@react-navigation/native';
-import { sendNotificationToUser } from '../utils/notifications'; // <-- ADD THIS IMPORT
+import { sendNotificationToUser } from '../utils/notifications';
 
 export default function ManageClaimsScreen() {
   const [claims, setClaims] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [qrModalVisible, setQrModalVisible] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [decision, setDecision] = useState('');
   const [message, setMessage] = useState('');
@@ -39,6 +40,11 @@ export default function ManageClaimsScreen() {
     setModalVisible(true);
   };
 
+  const openQrModal = (claim) => {
+    setSelectedClaim(claim);
+    setQrModalVisible(true);
+  };
+
   const handleDecision = async () => {
     if (!selectedClaim) return;
 
@@ -51,7 +57,6 @@ export default function ManageClaimsScreen() {
         updatedAt: firestore.FieldValue.serverTimestamp(),
       });
 
-      // ✅ Send push notification to the beneficiary
       await sendNotificationToUser(
         selectedClaim.beneficiaryId,
         `Your claim was ${decision}!`,
@@ -69,7 +74,7 @@ export default function ManageClaimsScreen() {
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={() => openQrModal(item)}>
       <Text style={styles.typeText}>Food: {item.foodType}</Text>
       <Text>Beneficiary: {item.beneficiaryEmail}</Text>
       <Text>Status: {item.status}</Text>
@@ -93,7 +98,7 @@ export default function ManageClaimsScreen() {
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -105,7 +110,7 @@ export default function ManageClaimsScreen() {
         ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20 }}>No claims yet.</Text>}
       />
 
-      {/* Modal */}
+      {/* Approve/Deny Modal */}
       <Modal
         visible={modalVisible}
         transparent
@@ -133,6 +138,28 @@ export default function ManageClaimsScreen() {
         </View>
       </Modal>
 
+      {/* QR Code Modal */}
+      <Modal
+        visible={qrModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setQrModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.qrModalContainer}>
+            <Text style={styles.modalTitle}>Scan to Confirm Pickup</Text>
+            <Image
+              source={require('../assets/qrcode.png')}
+              style={styles.qrImage}
+              resizeMode="contain"
+            />
+            <TouchableOpacity style={[styles.modalButton, { marginTop: 20 }]} onPress={() => setQrModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <BottomNavbar navigation={navigation} activeScreen="AddListing" userType="Donor" />
     </View>
   );
@@ -147,8 +174,10 @@ const styles = StyleSheet.create({
   buttonText: { color: '#fff', fontWeight: 'bold', marginLeft: 6 },
   modalBackground: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20 },
   modalContainer: { backgroundColor: '#fff', borderRadius: 8, padding: 20 },
+  qrModalContainer: { backgroundColor: '#fff', borderRadius: 8, padding: 20, alignItems: 'center' },
   modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' },
   input: { borderWidth: 1, borderColor: '#aaa', borderRadius: 6, padding: 10, marginBottom: 20 },
   modalButton: { backgroundColor: '#28a745', padding: 14, borderRadius: 6, marginBottom: 10, alignItems: 'center' },
   modalButtonText: { color: '#fff', fontWeight: 'bold' },
+  qrImage: { width: 250, height: 250, borderRadius: 12, marginTop: 20 }, // QR image style
 });

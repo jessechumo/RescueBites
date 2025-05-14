@@ -33,6 +33,9 @@ export default function LoginScreen({ navigation }) {
       } else if (userRole === 'Beneficiary') {
         await messaging().subscribeToTopic('beneficiaries');
         navigation.navigate('BrowseFood');
+      } else if (userRole === 'Distributor') {
+        await messaging().subscribeToTopic('distributors');
+        navigation.navigate('Distributor');
       } else {
         navigation.navigate('Home');
       }

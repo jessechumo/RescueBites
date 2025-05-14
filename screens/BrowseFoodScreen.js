@@ -62,14 +62,27 @@ export default function BrowseFoodScreen() {
         imageUrl: foodItem.imageUrl,
         pickupLocation: foodItem.pickupLocation,
       });
+
       // ✉️ NEW: Notify the donor
-    if (foodItem.donorId) {
-      await sendNotificationToUser(
-        foodItem.donorId,
-        'New Claim Received!',
-        `Someone has claimed your food: ${foodItem.type}`
-      );
-    }
+    const donorTokenDoc = await firestore()
+  .collection('userTokens')
+  .doc(foodItem.donorId)
+  .get();
+
+if (donorTokenDoc.exists) {
+  const { fcmToken } = donorTokenDoc.data();
+  
+  await fetch('http://10.188.230.155:5000/notify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      token: fcmToken,
+      title: 'New Claim Received!',
+      body: `Someone claimed your food: ${foodItem.type}`,
+    }),
+  });
+}
+
 
     Alert.alert('Success', 'Claim sent to the donor!');
   } catch (error) {

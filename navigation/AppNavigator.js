@@ -13,12 +13,16 @@ import ClaimStatusScreen from '../screens/ClaimStatusScreen';
 import DonorReportScreen from '../screens/DonorReportScreen'; 
 import ManageClaimsScreen from '../screens/ManageClaimsScreen';
 import ClaimDetailsScreen from '../screens/ClaimDetailsScreen';
+import ScannerScreen from '../screens/ScannerScreen';
+import DistributorScreen from '../screens/DistributorScreen';
 
+// import CameraPermissionScreen from '../components/CameraPermission';  
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   return ( 
-    <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+
+    <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}> 
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
       <Stack.Screen name="Home" component={HomeScreen} />
@@ -31,6 +35,8 @@ export default function AppNavigator() {
       <Stack.Screen name="DonorReport" component={DonorReportScreen} />
       <Stack.Screen name="ManageClaims" component={ManageClaimsScreen} /> 
       <Stack.Screen name="ClaimDetails" component={ClaimDetailsScreen} />
+      <Stack.Screen name="Scanner" component={ScannerScreen} />
+      <Stack.Screen name="Distributor" component={DistributorScreen} />
     </Stack.Navigator> 
   );
 }

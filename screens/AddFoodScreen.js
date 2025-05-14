@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView,
-  KeyboardAvoidingView, Platform, ActivityIndicator, Alert
+  KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Image
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { sendNotificationToTopic } from '../utils/notifications';
 
 export default function AddFoodScreen({ navigation }) {
@@ -12,6 +13,7 @@ export default function AddFoodScreen({ navigation }) {
   const [quantity, setQuantity] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [pickupLocation, setPickupLocation] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [uploading, setUploading] = useState(false);
 
   const validateInputs = () => {
@@ -32,7 +34,83 @@ export default function AddFoodScreen({ navigation }) {
       return false;
     }
 
+    if (!imageUrl) {
+      Alert.alert('Missing Image', 'Please add an image of the food.');
+      return false;
+    }
+
     return true;
+  };
+
+  const pickImage = async () => {
+    try {
+      const result = await launchImageLibrary({ mediaType: 'photo', quality: 0.7 });
+      if (result.didCancel) return;
+      if (result.assets && result.assets[0]) {
+        await uploadImageToCloudinary(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Image picker error:', error);
+      Alert.alert('Error', 'Failed to pick image.');
+    }
+  };
+
+  const takePhoto = async () => {
+    try {
+      const result = await launchCamera({ mediaType: 'photo', quality: 0.7 });
+      if (result.didCancel) return;
+      if (result.assets && result.assets[0]) {
+        await uploadImageToCloudinary(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Camera error:', error);
+      Alert.alert('Error', 'Failed to open camera.');
+    }
+  };
+
+  const uploadImageToCloudinary = async (uri) => {
+    setUploading(true);
+    try {
+      const base64Image = await uriToBase64(uri);
+      const cloudName = 'dwlot7xkj'; // replace with your cloudinary cloud name
+      const uploadPreset = 'ml_default'; // replace with your upload preset
+      const apiUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        body: JSON.stringify({
+          file: `data:image/jpeg;base64,${base64Image}`,
+          upload_preset: uploadPreset,
+        }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error('Cloudinary upload failed');
+      console.log('Image uploaded:', data.secure_url);
+
+      setImageUrl(data.secure_url);
+      Alert.alert('Success', 'Image uploaded successfully.');
+    } catch (error) {
+      console.error('Upload error:', error);
+      Alert.alert('Upload Failed', error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const uriToBase64 = async (uri) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      reader.onloadend = () => {
+        const base64 = reader.result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   };
 
   const handleSubmit = async () => {
@@ -52,6 +130,7 @@ export default function AddFoodScreen({ navigation }) {
         quantity: parseInt(quantity),
         expiryDate,
         pickupLocation: pickupLocation.trim(),
+        imageUrl,
         donorId: user.uid,
         donorEmail: user.email,
         foodStatus: 'Available',
@@ -59,10 +138,15 @@ export default function AddFoodScreen({ navigation }) {
         updatedAt: firestore.FieldValue.serverTimestamp(),
       });
 
-      await sendNotificationToTopic(
-        'New Food Listing!',
-        `${type} available at ${pickupLocation}.`
-      );
+      await fetch('http://10.188.230.155:5000/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: 'beneficiaries',
+          title: 'New Food Available!',
+          body: `${type} available at ${pickupLocation}`,
+        }),
+      });
 
       Alert.alert('Success', 'Food donation submitted successfully!');
       navigation.goBack();
@@ -105,12 +189,34 @@ export default function AddFoodScreen({ navigation }) {
           onChangeText={setPickupLocation}
         />
 
+        {imageUrl ? (
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: imageUrl }} style={styles.imagePreview} />
+            <TouchableOpacity onPress={() => setImageUrl('')}>
+              <Text style={styles.removeImageText}>Remove Image</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.button} onPress={pickImage}>
+              <Text style={styles.buttonText}>Gallery</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={takePhoto}>
+              <Text style={styles.buttonText}>Camera</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         <TouchableOpacity
-          style={styles.submitButton}
+          style={[styles.submitButton, uploading && styles.disabledButton]}
           onPress={handleSubmit}
           disabled={uploading}
         >
-          {uploading ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitButtonText}>Submit Donation</Text>}
+          {uploading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.submitButtonText}>Submit Donation</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -121,6 +227,13 @@ const styles = StyleSheet.create({
   container: { padding: 20, backgroundColor: '#fff' },
   heading: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: '#333' },
   input: { borderWidth: 1, borderColor: '#ccc', padding: 14, marginBottom: 16, borderRadius: 8, backgroundColor: '#f9f9f9' },
+  buttonRow: { flexDirection: 'row', justifyContent: 'space-around', marginVertical: 10 },
+  button: { backgroundColor: '#f0f0f0', padding: 14, borderRadius: 8, alignItems: 'center', minWidth: 120 },
+  buttonText: { color: '#333', fontWeight: 'bold' },
   submitButton: { backgroundColor: '#28a745', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 10 },
   submitButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  disabledButton: { backgroundColor: '#93c9a1' },
+  imageContainer: { alignItems: 'center', marginVertical: 10 },
+  imagePreview: { width: '100%', height: 200, borderRadius: 8 },
+  removeImageText: { color: 'red', marginTop: 10, fontWeight: '600' },
 });
