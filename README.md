@@ -1,21 +1,21 @@
-# 🥗 RescueBites
+# RescueBites
 
 RescueBites is a cross-platform mobile app built with React Native that bridges the gap between food donors and people in need by redistributing surplus food in real time. The app aims to reduce food waste while fighting hunger through a community-powered system.
 
 ---
 
-## 📱 Features
+## Features
 
-- 🔐 Secure login for Donors, Beneficiaries, and Distributors
-- 📸 Add food listings with image, expiry date, and location
-- 🧭 Find nearby pickup points using Google Maps
-- 🔔 Get notified about new food and approvals
-- 📦 Confirm pickups via QR code
-- 📊 Donor analytics and reports (planned)
+-  Secure login for Donors, Beneficiaries, and Distributors
+-  Add food listings with image, expiry date, and location
+-  Find nearby pickup points using Google Maps
+-  Get notified about new food and approvals
+-  Confirm pickups via QR code
+-  Donor analytics and reports (planned)
 
 ---
 
-## 🚀 Tech Stack
+##  Tech Stack
 
 - **React Native (JavaScript)** – built with functional components and hooks
 - **Firebase Authentication** – for user login/register/reset
@@ -28,7 +28,7 @@ RescueBites is a cross-platform mobile app built with React Native that bridges 
 
 ---
 
-## 🧾 Functional Requirements
+##  Functional Requirements
 
 | Req ID | Req Statement | 
 |--------|---------------| 
@@ -51,7 +51,7 @@ RescueBites is a cross-platform mobile app built with React Native that bridges 
 
 ---
 
-## 📋 Use Case List
+##  Use Case List
 
 | Use Case # | Use Case Name                      |
 |------------|------------------------------------|
@@ -74,13 +74,13 @@ RescueBites is a cross-platform mobile app built with React Native that bridges 
 
 ---
 
-## 📦 Design Class Diagram
+##  Design Class Diagram
      
 ![Screenshot From 2025-04-02 08-08-47](https://github.com/user-attachments/assets/e4ed7e87-8572-478b-b108-8048dbbd24fa)
 
 ---
 
-## 🛠️ How to Run  
+##  How to Run  
 
 ### Prerequisites
 
@@ -134,7 +134,7 @@ npx react-native run-android
 
 ---
 
-### ✅ For Demo
+###  For Demo
 
 - Log in as Donor, Beneficiary, or Distributor
 - Donors can add/edit/delete listings
@@ -143,7 +143,7 @@ npx react-native run-android
 
 ---
 
-## 📌 Notes
+##  Notes
 
 - QR scanning uses `react-native-camera` – tested on Android 10+
 - Push notifications use FCM (v1 API)
@@ -152,7 +152,7 @@ npx react-native run-android
 
 ---
 
-## 💡 Future Plans
+##  Future Plans
 
 - Real-time delivery tracking with geolocation
 - Analytics dashboard for donors
