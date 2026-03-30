@@ -18,11 +18,12 @@ const BottomNavbar = ({ userType }) => {
     Beneficiary: [
       { label: 'Profile',   icon: 'person-outline',       screen: 'Profile' },
       { label: 'Browse',    icon: 'search-outline',       screen: 'BrowseFood' },
-      { label: 'Claims',    icon: 'clipboard-outline',    screen: 'ClaimStatus' },  // ← added
+      { label: 'Map',       icon: 'map-outline',          screen: 'Map' },
+      { label: 'Claims',    icon: 'clipboard-outline',    screen: 'ClaimStatus' },
     ],
     Distributor: [
       { label: 'Profile',     icon: 'person-outline',     screen: 'Profile' },
-      { label: 'Deliveries',  icon: 'navigate-outline',   screen: 'ManageDeliveries' },
+      { label: 'Deliveries',  icon: 'navigate-outline',   screen: 'Distributor' },
     ],
   };
 
