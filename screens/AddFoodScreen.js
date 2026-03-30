@@ -6,6 +6,8 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import Geolocation from '@react-native-community/geolocation';
+import RNFS from 'react-native-fs';
 import { sendNotificationToTopic } from '../utils/notifications';
 
 export default function AddFoodScreen({ navigation }) {
@@ -71,9 +73,9 @@ export default function AddFoodScreen({ navigation }) {
   const uploadImageToCloudinary = async (uri) => {
     setUploading(true);
     try {
-      const base64Image = await uriToBase64(uri);
-      const cloudName = 'dwlot7xkj'; // replace with your cloudinary cloud name
-      const uploadPreset = 'ml_default'; // replace with your upload preset
+      const base64Image = await RNFS.readFile(uri, 'base64');
+      const cloudName = 'dwlot7xkj';
+      const uploadPreset = 'ml_default';
       const apiUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
       const response = await fetch(apiUrl, {
@@ -87,7 +89,6 @@ export default function AddFoodScreen({ navigation }) {
 
       const data = await response.json();
       if (!response.ok) throw new Error('Cloudinary upload failed');
-      console.log('Image uploaded:', data.secure_url);
 
       setImageUrl(data.secure_url);
       Alert.alert('Success', 'Image uploaded successfully.');
@@ -97,20 +98,6 @@ export default function AddFoodScreen({ navigation }) {
     } finally {
       setUploading(false);
     }
-  };
-
-  const uriToBase64 = async (uri) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-    const reader = new FileReader();
-    return new Promise((resolve, reject) => {
-      reader.onloadend = () => {
-        const base64 = reader.result.split(',')[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
   };
 
   const handleSubmit = async () => {
@@ -125,6 +112,22 @@ export default function AddFoodScreen({ navigation }) {
         return;
       }
 
+      // Capture GPS coordinates for map display
+      const coords = await new Promise(resolve => {
+        Geolocation.getCurrentPosition(
+          pos => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+          () => resolve(null),
+          { enableHighAccuracy: true, timeout: 10000 },
+        );
+      });
+
+      if (!coords) {
+        Alert.alert(
+          'Location Unavailable',
+          'Could not get your GPS location. The listing will be saved but will not appear on the map.',
+        );
+      }
+
       await firestore().collection('foodItems').add({
         type: type.trim(),
         quantity: parseInt(quantity),
@@ -134,19 +137,17 @@ export default function AddFoodScreen({ navigation }) {
         donorId: user.uid,
         donorEmail: user.email,
         foodStatus: 'Available',
+        latitude: coords?.latitude || null,
+        longitude: coords?.longitude || null,
         createdAt: firestore.FieldValue.serverTimestamp(),
         updatedAt: firestore.FieldValue.serverTimestamp(),
       });
 
-      await fetch('http://10.188.230.155:5000/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          topic: 'beneficiaries',
-          title: 'New Food Available!',
-          body: `${type} available at ${pickupLocation}`,
-        }),
-      });
+      await sendNotificationToTopic(
+        'New Food Available!',
+        `${type} available at ${pickupLocation}`,
+        'beneficiaries',
+      );
 
       Alert.alert('Success', 'Food donation submitted successfully!');
       navigation.goBack();
