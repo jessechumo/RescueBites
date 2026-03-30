@@ -63,28 +63,13 @@ export default function BrowseFoodScreen() {
         pickupLocation: foodItem.pickupLocation,
       });
 
-      // ✉️ NEW: Notify the donor
-    const donorTokenDoc = await firestore()
-  .collection('userTokens')
-  .doc(foodItem.donorId)
-  .get();
+      await sendNotificationToUser(
+        foodItem.donorId,
+        'New Claim Received!',
+        `Someone claimed your food: ${foodItem.type}`,
+      );
 
-if (donorTokenDoc.exists) {
-  const { fcmToken } = donorTokenDoc.data();
-  
-  await fetch('http://10.188.230.155:5000/notify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      token: fcmToken,
-      title: 'New Claim Received!',
-      body: `Someone claimed your food: ${foodItem.type}`,
-    }),
-  });
-}
-
-
-    Alert.alert('Success', 'Claim sent to the donor!');
+      Alert.alert('Success', 'Claim sent to the donor!');
   } catch (error) {
     console.error('Claim error:', error);
     Alert.alert('Error', error.message || 'Failed to claim food.');

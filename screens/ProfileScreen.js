@@ -2,17 +2,29 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BottomNavbar from '../components/BottomNavbar';
 import { useNavigation } from '@react-navigation/native';
 
 export default function ProfileScreen() {
   const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState('Donor');
   const navigation = useNavigation();
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged((currentUser) => {
+    const unsubscribe = auth().onAuthStateChanged(async currentUser => {
       setUser(currentUser);
+      if (currentUser) {
+        try {
+          const doc = await firestore().collection('users').doc(currentUser.uid).get();
+          if (doc.exists) {
+            setUserRole(doc.data().role || 'Donor');
+          }
+        } catch (error) {
+          console.error('Failed to fetch user role:', error);
+        }
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -29,7 +41,6 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Profile Content */}
       <View style={styles.profileSection}>
         {user?.photoURL ? (
           <Image source={{ uri: user.photoURL }} style={styles.profileImage} />
@@ -40,13 +51,14 @@ export default function ProfileScreen() {
         )}
 
         <Text style={styles.userEmail}>{user?.email}</Text>
+        <Text style={styles.userRole}>{userRole}</Text>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
       </View>
 
-      <BottomNavbar navigation={navigation} activeScreen="AddListing" userType="Donor" />
+      <BottomNavbar userType={userRole} />
     </View>
   );
 }
@@ -77,8 +89,14 @@ const styles = StyleSheet.create({
   userEmail: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 20,
+    marginBottom: 4,
     textAlign: 'center',
+  },
+  userRole: {
+    fontSize: 14,
+    color: '#28a745',
+    fontWeight: '500',
+    marginBottom: 20,
   },
   logoutButton: {
     backgroundColor: '#dc3545',

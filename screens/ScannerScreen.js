@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
-import { Camera, useCameraDevices } from 'react-native-vision-camera';
+import { Camera, useCameraDevice } from 'react-native-vision-camera';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 export default function ScannerScreen() {
   const navigation = useNavigation();
   const { params } = useRoute();
-  const devices = useCameraDevices();
-  const device = devices.back;
+  const device = useCameraDevice('back');
   const successTimerRef = useRef(null);
   const [cameraPermission, setCameraPermission] = useState(null);
   const [cameraReady, setCameraReady] = useState(false);
@@ -22,7 +21,7 @@ export default function ScannerScreen() {
   useEffect(() => {
     if (cameraReady) {
       successTimerRef.current = setTimeout(() => {
-        Alert.alert('Success', `✅ Pickup confirmed for ${params?.food?.foodType || 'item'}!`, [
+        Alert.alert('Success', `Pickup confirmed for ${params?.food?.foodType || 'item'}!`, [
           { text: 'OK', onPress: () => navigation.goBack() },
         ]);
       }, 4000);
@@ -33,8 +32,7 @@ export default function ScannerScreen() {
     };
   }, [cameraReady, navigation, params?.food?.foodType]);
 
-  if (cameraPermission !== 'authorized') {
-    // Still waiting for permission
+  if (cameraPermission !== 'granted') {
     return (
       <View style={styles.loading}>
         <Text style={{ color: '#fff' }}>Requesting Camera Permission...</Text>

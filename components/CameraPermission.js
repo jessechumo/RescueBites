@@ -6,21 +6,23 @@ export default function CameraPermissionScreen({ navigation }) {
   useEffect(() => {
     async function checkPermissions() {
       let cameraPermission = await Camera.getCameraPermissionStatus();
-      if (cameraPermission !== 'authorized') {
+      if (cameraPermission !== 'granted') {
         cameraPermission = await Camera.requestCameraPermission();
       }
 
       let micPermission = await Camera.getMicrophonePermissionStatus();
-      if (micPermission !== 'authorized') {
+      if (micPermission !== 'granted') {
         micPermission = await Camera.requestMicrophonePermission();
       }
 
-      // Important: cameraPermission and micPermission are the results of request functions
-      if (cameraPermission === 'authorized' && micPermission === 'authorized') {
+      if (cameraPermission === 'granted' && micPermission === 'granted') {
         navigation.replace('Login');
       } else {
-        // Optional: handle if user denies permission
-        console.warn('Camera or Microphone permission not granted.');
+        Alert.alert(
+          'Permissions Required',
+          'Camera and microphone access are needed for QR scanning and photo capture. You can grant them in your device settings.',
+          [{ text: 'Continue', onPress: () => navigation.replace('Login') }],
+        );
       }
     }
 
